@@ -196,37 +196,6 @@ export const PullRequestRow = Schema.Struct({
 })
 export interface PullRequestRow extends Schema.Struct.Type<typeof PullRequestRow.fields> {}
 
-/** A stack of PullRequests */
-export const PullRequestStack = Schema.Struct({
-  /** A number uniquely identifying the stack within its repository */
-  number: Shared.Int,
-  /** The total number of pull requests in the stack */
-  size: Shared.Int,
-  /** The branch that the stack's pull requests target */
-  baseRefName: Schema.String
-})
-export interface PullRequestStack extends Schema.Struct.Type<typeof PullRequestStack.fields> {}
-
-/** A member of a PullRequestStack */
-export const PullRequestStackEntry = Schema.Struct({
-  /** This entry's position in the stack, where 1 is the closest to the base branch, 2 is stacked on top of 1, etc. */
-  position: Shared.Int
-})
-export interface PullRequestStackEntry extends Schema.Struct.Type<typeof PullRequestStackEntry.fields> {}
-
-/**
- * `fragment PullRequestRowStack on PullRequest`
- *
- * A repository pull request.
- */
-export const PullRequestRowStack = Schema.Struct({
-  /** The stack this Pull Request belongs to, or null if it is not part of a stack */
-  stack: Schema.NullOr(PullRequestStack),
-  /** The stack entry for this Pull Request, or null if it is not part of a stack */
-  stackEntry: Schema.NullOr(PullRequestStackEntry)
-})
-export interface PullRequestRowStack extends Schema.Struct.Type<typeof PullRequestRowStack.fields> {}
-
 /** Information about pagination in a connection. */
 export const PageInfo = Schema.Struct({
   /** When paginating forwards, are there more items? */
@@ -237,11 +206,11 @@ export const PageInfo = Schema.Struct({
 export interface PageInfo extends Schema.Struct.Type<typeof PageInfo.fields> {}
 
 /** A repository pull request. */
-export const PullRequestSearchSearchNodesPullRequest = Schema.Struct({
+export const PullRequest = Schema.Struct({
   __typename: Schema.Literal("PullRequest"),
   ...PullRequestRow.fields
 })
-export interface PullRequestSearchSearchNodesPullRequest extends Schema.Struct.Type<typeof PullRequestSearchSearchNodesPullRequest.fields> {}
+export interface PullRequest extends Schema.Struct.Type<typeof PullRequest.fields> {}
 
 /** The results of a search. */
 export const SearchResultItemOther = Schema.Struct({
@@ -254,16 +223,16 @@ export interface SearchResultItemOther extends Schema.Struct.Type<typeof SearchR
  * of matches, a maximum of 1,000 results will be available across all types,
  * potentially split across many pages.
  */
-export const PullRequestSearchSearchSearchResultItemConnection = Schema.Struct({
+export const SearchResultItemConnection = Schema.Struct({
   /** Information to aid in pagination. */
   pageInfo: PageInfo,
   /** A list of nodes. */
   nodes: Schema.NullOr(Schema.Array(Schema.NullOr(Schema.Union([
-    PullRequestSearchSearchNodesPullRequest,
+    PullRequest,
     SearchResultItemOther
   ]))))
 })
-export interface PullRequestSearchSearchSearchResultItemConnection extends Schema.Struct.Type<typeof PullRequestSearchSearchSearchResultItemConnection.fields> {}
+export interface SearchResultItemConnection extends Schema.Struct.Type<typeof SearchResultItemConnection.fields> {}
 
 /** `query PullRequestSearch` */
 export const PullRequestSearch = GraphQL.query("PullRequestSearch", {
@@ -289,7 +258,7 @@ export const PullRequestSearch = GraphQL.query("PullRequestSearch", {
   },
   result: Schema.Struct({
     /** Perform a search across resources, returning a maximum of 1,000 results. */
-    search: PullRequestSearchSearchSearchResultItemConnection
+    search: SearchResultItemConnection
   })
 })
 export declare namespace PullRequestSearch {
@@ -349,62 +318,5 @@ export declare namespace PullRequestList {
   export type Result = typeof PullRequestList.result.Type
 }
 
-/** A repository pull request. */
-export const PullRequestSearchWithStacksSearchNodesPullRequest = Schema.Struct({
-  __typename: Schema.Literal("PullRequest"),
-  ...PullRequestRow.fields,
-  ...PullRequestRowStack.fields
-})
-export interface PullRequestSearchWithStacksSearchNodesPullRequest extends Schema.Struct.Type<typeof PullRequestSearchWithStacksSearchNodesPullRequest.fields> {}
-
-/**
- * A list of results that matched against a search query. Regardless of the number
- * of matches, a maximum of 1,000 results will be available across all types,
- * potentially split across many pages.
- */
-export const PullRequestSearchWithStacksSearchSearchResultItemConnection = Schema.Struct({
-  /** Information to aid in pagination. */
-  pageInfo: PageInfo,
-  /** A list of nodes. */
-  nodes: Schema.NullOr(Schema.Array(Schema.NullOr(Schema.Union([
-    PullRequestSearchWithStacksSearchNodesPullRequest,
-    SearchResultItemOther
-  ]))))
-})
-export interface PullRequestSearchWithStacksSearchSearchResultItemConnection extends Schema.Struct.Type<typeof PullRequestSearchWithStacksSearchSearchResultItemConnection.fields> {}
-
-/** `query PullRequestSearchWithStacks` */
-export const PullRequestSearchWithStacks = GraphQL.query("PullRequestSearchWithStacks", {
-  document: {
-    variables: [
-      { name: "q", body: "String!" },
-      { name: "first", body: "Int!" },
-      { name: "after", body: "String" },
-      { name: "stats", body: "Boolean!" }
-    ],
-    selections: [
-      { name: "search", body: ["(query:$", "q", " type:ISSUE first:$", "first", " after:$", "after", "){pageInfo{hasNextPage endCursor}nodes{__typename...", "PullRequestRow", "...PullRequestRowStack}}"] }
-    ],
-    fragments: [
-      { name: "PullRequestRow", body: ["on PullRequest{number title url author{__typename login avatarUrl...on User{name}}headRefName baseRefName state isDraft mergeable reviewDecision latestReviews(first:20){nodes{state isMinimized author{__typename login}}}additions@include(if:$", "stats", ")deletions@include(if:$", "stats", ")createdAt updatedAt mergedAt repository{nameWithOwner}reviewRequests(first:20){nodes{requestedReviewer{__typename...on User{login}...on Team{slug}}}}labels(first:20){nodes{name color description}}commits(last:1){nodes{commit{statusCheckRollup{state}}}}}"] },
-      { name: "PullRequestRowStack", body: ["on PullRequest{stack{number size baseRefName}stackEntry{position}}"] }
-    ]
-  },
-  variables: {
-    q: Schema.String,
-    first: Shared.Int,
-    after: Schema.optional(Schema.NullOr(Schema.String)),
-    stats: Schema.Boolean
-  },
-  result: Schema.Struct({
-    /** Perform a search across resources, returning a maximum of 1,000 results. */
-    search: PullRequestSearchWithStacksSearchSearchResultItemConnection
-  })
-})
-export declare namespace PullRequestSearchWithStacks {
-  export type Variables = typeof PullRequestSearchWithStacks.variables.Type
-  export type Result = typeof PullRequestSearchWithStacks.result.Type
-}
-
 /** Every operation in pullRequestListings.graphql. */
-export const PullRequestListingsGraphQLGroup = GraphQLGroup.make(PullRequestSearch, PullRequestList, PullRequestSearchWithStacks)
+export const PullRequestListingsGraphQLGroup = GraphQLGroup.make(PullRequestSearch, PullRequestList)

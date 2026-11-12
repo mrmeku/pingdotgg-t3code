@@ -1,0 +1,57 @@
+# Enterprise Server has no pull request stacks and rejects a document that names one, so the
+# operations that read them are sent to github.com only.
+
+fragment PullRequestRowStack on PullRequest {
+  stack {
+    number
+    size
+    baseRefName
+  }
+  stackEntry {
+    position
+  }
+}
+
+query PullRequestSummaryWithStacks($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      ...PullRequestSummaryFields
+      stack {
+        number
+        size
+        baseRefName
+      }
+      stackEntry {
+        position
+      }
+    }
+  }
+}
+
+query PullRequestStackMembership($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      stack {
+        number
+        size
+        baseRefName
+      }
+      stackEntry {
+        position
+      }
+    }
+  }
+}
+
+query PullRequestSearchWithStacks($q: String!, $first: Int!, $after: String, $stats: Boolean!) {
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      ...PullRequestRow
+      ...PullRequestRowStack
+    }
+  }
+}

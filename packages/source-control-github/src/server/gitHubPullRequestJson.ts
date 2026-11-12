@@ -41,6 +41,10 @@ import { dedupeChecks } from "@t3tools/source-control-core/server/pullRequestChe
 import type { ProviderChangeRequestSummary } from "@t3tools/source-control-core/server/PullRequestProvider";
 
 import type * as GitHubSchema from "../../schema/github.graphql.ts";
+import {
+  PullRequestRowStack,
+  PullRequestSearchWithStacks,
+} from "./githubDotCom/pullRequestStacks.graphql.ts";
 import type {
   PullRequestSummaryFields,
   PullRequestWatchFingerprintRepositoryPullRequestPullRequest as WatchedPullRequest,
@@ -49,9 +53,7 @@ import {
   PageInfo as ListingPageInfo,
   PullRequestList,
   PullRequestRow,
-  PullRequestRowStack,
   PullRequestSearch,
-  PullRequestSearchWithStacks,
 } from "./pullRequestListings.graphql.ts";
 import type { PullRequestActionSummary } from "./pullRequestMutations.graphql.ts";
 import type {

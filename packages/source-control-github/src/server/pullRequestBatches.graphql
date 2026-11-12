@@ -52,43 +52,11 @@ query PullRequestSummary($owner: String!, $name: String!, $number: Int!) {
   }
 }
 
-# github.com only: Enterprise Server has no pull request stacks.
-query PullRequestSummaryWithStacks($owner: String!, $name: String!, $number: Int!) {
-  repository(owner: $owner, name: $name) {
-    pullRequest(number: $number) {
-      ...PullRequestSummaryFields
-      stack {
-        number
-        size
-        baseRefName
-      }
-      stackEntry {
-        position
-      }
-    }
-  }
-}
-
 query PullRequestStats($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       additions
       deletions
-    }
-  }
-}
-
-query PullRequestStackMembership($owner: String!, $name: String!, $number: Int!) {
-  repository(owner: $owner, name: $name) {
-    pullRequest(number: $number) {
-      stack {
-        number
-        size
-        baseRefName
-      }
-      stackEntry {
-        position
-      }
     }
   }
 }

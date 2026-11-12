@@ -74,18 +74,6 @@ fragment PullRequestRow on PullRequest {
   }
 }
 
-# github.com only: Enterprise Server has no pull request stacks.
-fragment PullRequestRowStack on PullRequest {
-  stack {
-    number
-    size
-    baseRefName
-  }
-  stackEntry {
-    position
-  }
-}
-
 # Every repository of a host in one read, which is what makes a listing one request rather than
 # one per repository. `$first` is at most 100: `search` refuses anything larger with
 # EXCESSIVE_PAGINATION.
@@ -125,19 +113,6 @@ query PullRequestList(
       nodes {
         ...PullRequestRow
       }
-    }
-  }
-}
-
-query PullRequestSearchWithStacks($q: String!, $first: Int!, $after: String, $stats: Boolean!) {
-  search(query: $q, type: ISSUE, first: $first, after: $after) {
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-    nodes {
-      ...PullRequestRow
-      ...PullRequestRowStack
     }
   }
 }

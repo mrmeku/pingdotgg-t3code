@@ -50,6 +50,10 @@ import * as GitHubRest from "./GitHubRest.ts";
 import * as GitHubPullRequestEvents from "./gitHubPullRequestEvents.ts";
 import * as GitHubRequestPolicy from "./GitHubRequestPolicy.ts";
 import * as GitHubGraphQlClient from "./gitHubGraphQlClient.ts";
+import {
+  PullRequestStackMembership,
+  PullRequestSummaryWithStacks,
+} from "./githubDotCom/pullRequestStacks.graphql.ts";
 import { PullRequestBatchesGraphQLGroup } from "./pullRequestBatches.graphql.ts";
 import {
   PullRequestMutationsGraphQLGroup,
@@ -943,6 +947,8 @@ const GRAPHQL_MERGE_METHODS = {
 const PullRequestGraphQLGroup = GraphQLGroup.merge(
   PullRequestBatchesGraphQLGroup,
   GraphQLGroup.make(
+    PullRequestSummaryWithStacks,
+    PullRequestStackMembership,
     LenientPullRequestSearch,
     LenientPullRequestSearchWithStacks,
     LenientPullRequestList,

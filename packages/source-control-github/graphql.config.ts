@@ -1,7 +1,8 @@
 import { defineConfig } from "@effect/graphql-generator/Config";
 
 // Public schema: https://docs.github.com/public/fpt/schema.docs.graphql. Enterprise Server validates a
-// whole document before @include, so fields it lacks belong in separate github.com-only documents.
+// whole document before @include, so a document that names a field it lacks goes in
+// `src/server/githubDotCom`.
 export default defineConfig({
   schema: "./schema/github.graphql",
   documents: ["src/**/*.graphql"],
